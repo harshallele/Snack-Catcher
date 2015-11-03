@@ -18,7 +18,6 @@ var score=0;
 d1=new Date();
 t1=d1.getTime();
 
-
 //timer used for timing position updates
 var updateTimer=t1;
 
@@ -43,6 +42,10 @@ var snackMoveCounter =sporadicity;
 
 //The code for direction in which the snack will move.
 var directionCode=randInt(1,4);
+
+//boolean that tells whether the game is paused or not.
+var isPaused=false;
+
 
 //init
 function init(){
@@ -92,7 +95,6 @@ function init(){
 //Game loop
 function loop(){
 
-
 update();
 render();
 
@@ -117,10 +119,20 @@ function update(){
 	right-39
 	up-38
 	down-40
+	space-32
+	ESC-27
 	*/
+	
+	
 	var date=new Date();
 	var curTime=date.getTime();
-	if(curTime-updateTimer>=25){ 
+	
+	if(pressedKeys[27]){
+		isPaused=!isPaused;
+	}
+	
+	
+	if(curTime-updateTimer>=25 && !isPaused){ 
 		//if the position of the snake is inside the canvas boundaries,then update position of snake according to key pressed.
 		if(pressedKeys[37]){
 			if(snake.pos_x>0){
@@ -142,6 +154,9 @@ function update(){
 				snake.pos_y+=10;
 			}
 		}
+		
+		
+		
 	
 		detectCollision();
 		//if the snake has collided with the snack,then update position of snack
@@ -214,6 +229,7 @@ function update(){
 			snackMoveCounter=sporadicity;
 		}
 		
+		
 		updateTimer=curTime;
 	
 	}
@@ -223,6 +239,13 @@ function update(){
 	
 	
 }
+
+
+
+
+
+
+
 	
 //render scene
 function render(){
@@ -240,14 +263,23 @@ ctx.fillStyle="#fff";
 ctx.font = "bold 20px helvetica";
 ctx.fillText("Score:"+score,10,20);
 
+
+console.log("isPaused:"+isPaused);
 	
-		//update info about framecount and framerate	
-		infoBox.innerHTML="";
-		infoBox.innerHTML="Total no. of frames rendered: "+frameCount+"<br>Instantaneous framerate: "+frameRate;
-		cTime=new Date().getTime();
+
+//update info about framecount and framerate	
+infoBox.innerHTML="";
+infoBox.innerHTML="Total no. of frames rendered: "+frameCount+"<br>Instantaneous framerate: "+frameRate;
+	
 		
 
 }
+
+
+
+
+
+
 
 
 //collision detection
@@ -265,6 +297,11 @@ function detectCollision(){
 }
 
 
+
+
+
+
+
 //when a key is pressed down,put the keycode in the pressedKeys array
 function onKeyDown(e){
 	
@@ -273,11 +310,12 @@ function onKeyDown(e){
 }
 
 
+
 //when a pressed key is let go of,clear out the pressedKeys array
 function onKeyUp(e){
 	delete pressedKeys[e.keyCode];
-	
 }
+
 
 
 
@@ -285,7 +323,6 @@ function onKeyUp(e){
 //return a random integer from a range of values between min and max
 function randInt(min,max){
 	return(Math.floor(Math.random() * (max - min + 1)) + min);
-	
 	}
 
 
