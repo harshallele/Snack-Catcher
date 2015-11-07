@@ -1,4 +1,5 @@
 window.addEventListener("load",init);
+window.addEventListener("resize",resizeGame);
 
 
 var canvas,ctx;
@@ -53,6 +54,10 @@ var secDirectionCode=randInt(1,2);
 var isPaused=false;
 
 
+//size of player and snack
+var char_size;
+	
+
 //init
 function init(){
 	
@@ -65,11 +70,9 @@ function init(){
 	canvas.height=window.innerHeight*0.8;
 	
 	
-	//size of player and snack
-	var char_size;
 	//size is avarage of 2.5% of the width and height of canvas.
 	//PROBABLY WILL CHANGE
-	char_size=((canvas.width*0.025)+(canvas.height*0.025))/2
+	char_size=((canvas.width*0.025)+(canvas.height*0.025))/2;
 	
 	
 	//define position and size of the player and the snack
@@ -132,7 +135,8 @@ requestAnimFrame(loop);
 
 }
 
-//method for updating the postion of the player and/or snack
+//method for updating the postion of the player and/or snack,
+//detecting collisions and resize events
 function update(){
 	/*
 	Keycodes:
@@ -311,12 +315,6 @@ infoBox.innerHTML="Total no. of frames rendered: "+frameCount+"<br>Instantaneous
 }
 
 
-
-
-
-
-
-
 //collision detection
 function detectCollision(){
 		
@@ -333,6 +331,43 @@ function detectCollision(){
 
 
 
+//resize the size of the canvas,the sizes,speeds and positions of the player
+function resizeGame(){
+	var width_ratio,height_ratio;
+	
+	//get the ratio of new canvas width/height to that of old canvas width/height,
+	//for calculating the new positions of the player and the snack.
+	width_ratio=(window.innerWidth*0.8)/canvas.width;
+	height_ratio=(window.innerHeight*0.8)/canvas.height;
+
+	//change size of canvas
+	canvas.width=window.innerWidth*0.8;
+	canvas.height=window.innerHeight*0.8;
+	
+	char_size=((canvas.width*0.025)+(canvas.height*0.025))/2;
+	
+	//change size,position and speed of player according to the new size of the window
+	player.width=char_size;
+	player.height=char_size;
+	player.diff_x=canvas.width*0.015;
+	player.diff_y=canvas.height*0.015;
+	player.pos_x=player.pos_x*width_ratio;
+	player.pos_y=player.pos_y*height_ratio;
+	
+	
+	//change size,position and speed of snack according to the new size of the window 
+	snack.width=char_size;
+	snack.height=char_size;
+	snack.diff_x=canvas.width*0.01;
+	snack.diff_y=canvas.height*0.01;
+	snack.pos_x=snack.pos_x*width_ratio;
+	snack.pos_y=snack.pos_y*height_ratio;
+	
+	
+	
+	
+	
+}
 
 
 
