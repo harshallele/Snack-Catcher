@@ -2,9 +2,12 @@
 	background-color:#E4E4E4;
 	float:left;
 	margin-right:10px;
+	z-index:1;
+	position:absolute;
 }
 
-#infoDiv{
+#infoDiv{	
 	float:left;
 	display:none;	
 }
+

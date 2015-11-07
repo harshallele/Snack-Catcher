@@ -1,9 +1,10 @@
 window.addEventListener("load",init);
 
+
 var canvas,ctx;
 
-//global variables for the snake and snack
-var snake,snack;
+//global variables for the player and snack
+var player,snack;
 
 //the array of pressed keys
 var pressedKeys=[];
@@ -40,8 +41,13 @@ var sporadicity=100;
 var snackMoveCounter =sporadicity;
 
 
-//The code for direction in which the snack will move.
+//if this is equal to 1,then the snack moves in multiple directions.
+//if it is 0,it moves in a single direction
+var isMultiDir=randInt(0,1);
+
+//The codes for the direction/s in which the snack will move.
 var directionCode=randInt(1,4);
+var secDirectionCode=randInt(1,2);
 
 //boolean that tells whether the game is paused or not.
 var isPaused=false;
@@ -54,29 +60,38 @@ function init(){
 	ctx=canvas.getContext("2d");
 	
 	
-	/*
-	canvas.width=window.innerWidth;
-	canvas.height=window.innerHeight;
-	*/
+	
+	canvas.width=window.innerWidth*0.8;
+	canvas.height=window.innerHeight*0.8;
 	
 	
-	//define position and size of the snake and the snack
-	snake={
-		pos_x:50,
+	//size of player and snack
+	var char_size;
+	//size is avarage of 2.5% of the width and height of canvas.
+	//PROBABLY WILL CHANGE
+	char_size=((canvas.width*0.025)+(canvas.height*0.025))/2
+	
+	
+	//define position and size of the player and the snack
+	player={
+		pos_x:20,
 		pos_y:50,
-		width:20,
-		height:20
+		width:char_size,
+		height:char_size,
+		diff_x:canvas.width*0.015,
+		diff_y:canvas.height*0.015
 		
 	};
 	
 	snack={
 		pos_x:randInt(0,500),
 		pos_y:randInt(0,500),
-		width:20,
-		height:20,
-		diff_pos:5	
-		
+		width:char_size,
+		height:char_size,
+		diff_x:canvas.width*0.01,
+		diff_y:canvas.height*0.01
 	};
+	
 	
 	//event handlers for the key down and up
 	window.onkeydown=function(e){
@@ -92,8 +107,6 @@ function init(){
 	//DOM element for displaying info about framerate and total no of frames rendered.
 	infoBox=document.getElementById("infoDiv");
 
-	console.log(window.innerWidth);
-	console.log(window.innerHeight);
 	
 	//begin the loop
 	loop();
@@ -119,13 +132,13 @@ requestAnimFrame(loop);
 
 }
 
-//method for updating the postion of the snake and/or snack
+//method for updating the postion of the player and/or snack
 function update(){
 	/*
 	Keycodes:
 	left-37
-	right-39
 	up-38
+	right-39
 	down-40
 	space-32
 	ESC-27
@@ -143,33 +156,30 @@ function update(){
 	
 	
 	if(curTime-updateTimer>=25 && !isPaused){ 
-		//if the position of the snake is inside the canvas boundaries,then update position of snake according to key pressed.
+		//if the position of the player is inside the canvas boundaries,then update position of player according to key pressed.
 		if(pressedKeys[37]){
-			if(snake.pos_x>0){
-				snake.pos_x-=10;
+			if(player.pos_x>0){
+				player.pos_x-=player.diff_x;
 			}	
 		}
 		if(pressedKeys[38]){
-			if(snake.pos_y>0){
-				snake.pos_y-=10;
+			if(player.pos_y>0){
+				player.pos_y-=player.diff_y;
 			}
 		}
 		if(pressedKeys[39]){
-			if(snake.pos_x<canvas.width-20){
-				snake.pos_x+=10;
+			if(player.pos_x<canvas.width-player.width){
+				player.pos_x+=player.diff_x;
 			}	
 		}
 		if(pressedKeys[40]){
-			if(snake.pos_y<canvas.height-20){
-				snake.pos_y+=10;
+			if(player.pos_y<canvas.height-player.height){
+				player.pos_y+=player.diff_y;
 			}
 		}
 		
-		
-		
-	
 		detectCollision();
-		//if the snake has collided with the snack,then update position of snack
+		//if the player has collided with the snack,then update position of snack
 		//Also,update sporadicity.
 		if(collided){
 			snack.pos_x=randInt(0,canvas.width-10);
@@ -189,34 +199,42 @@ function update(){
 		}
 		
 		
-		
 		//if snackMoveCounter is greater than 0, then the snack will be moved 
 		//and snackMoveCounter will be subtracted by 1.
 		//if it is 0,then the snackMoveCounter will be reset to initial value 
-		//and a new direction will be chosen for a snack
+		//and a new direction will be chosen for the snack
 		//Also, if the snack is touching any of the edges, snackMoveCounter will 
 		//be set to 0 so that it will be given a new direction in the next frame.
+		//Motion of snack is set randomly to be either single or multi directional(TODO)
+		
+		/*
+		Direction Codes:
+		left-2
+		right-1
+		down-3
+		up-4
+		*/
 		if(snackMoveCounter > 0){
 			switch (directionCode){
 				case 1:
-					if(snack.pos_x < canvas.width-20){ 
-						snack.pos_x+=snack.diff_pos;
-					}
+					if(snack.pos_x < canvas.width-snack.width){ 
+						snack.pos_x+=snack.diff_x;
+						}
 					else{
 						snackMoveCounter=0;
 					}
 					break;
 				case 2:
 					if(snack.pos_x > 0){
-					snack.pos_x-=snack.diff_pos;
+					snack.pos_x-=snack.diff_x;
 					}
 					else{
 						snackMoveCounter=0;
 					}
 					break;
 				case 3:
-					if(snack.pos_y < canvas.height-20){
-					snack.pos_y+=snack.diff_pos;
+					if(snack.pos_y < canvas.height-snack.height){
+					snack.pos_y+=snack.diff_y;
 					}
 					else{
 						snackMoveCounter=0;
@@ -224,7 +242,7 @@ function update(){
 					break;
 				case 4:
 					if(snack.pos_y > 0){
-					snack.pos_y-=snack.diff_pos;
+					snack.pos_y-=snack.diff_y;
 					}
 					else{
 						snackMoveCounter=0;
@@ -236,6 +254,8 @@ function update(){
 		}
 		else{
 			directionCode=randInt(1,4);
+			secDirectionCode=randInt(1,2);
+			isMultiDir=randInt(0,1);
 			snackMoveCounter=sporadicity;
 		}
 		
@@ -250,9 +270,9 @@ function update(){
 function render(){
 //clear the previous frame
 ctx.clearRect(0,0,canvas.width,canvas.height);
-//draw the snake
+//draw the player
 ctx.fillStyle="#f00";
-ctx.fillRect(snake.pos_x,snake.pos_y,snake.width,snake.height);
+ctx.fillRect(player.pos_x,player.pos_y,player.width,player.height);
 //draw the snack
 ctx.fillStyle="#0f0";
 ctx.fillRect(snack.pos_x,snack.pos_y,snack.width,snack.height);
@@ -300,10 +320,10 @@ infoBox.innerHTML="Total no. of frames rendered: "+frameCount+"<br>Instantaneous
 //collision detection
 function detectCollision(){
 		
-		if(snake.pos_x<snack.pos_x+snack.width &&
-		snake.pos_x+snake.width>snack.pos_x &&
-		snake.pos_y<snack.pos_y+snack.height &&
-		snake.pos_y+snake.height>snack.pos_y
+		if(player.pos_x<snack.pos_x+snack.width &&
+		player.pos_x+player.width>snack.pos_x &&
+		player.pos_y<snack.pos_y+snack.height &&
+		player.pos_y+player.height>snack.pos_y
 		){
 			collided=true;
 			console.log("Collision detected");
