@@ -53,6 +53,13 @@ function init(){
 	canvas = document.getElementById("screen");
 	ctx=canvas.getContext("2d");
 	
+	
+	/*
+	canvas.width=window.innerWidth;
+	canvas.height=window.innerHeight;
+	*/
+	
+	
 	//define position and size of the snake and the snack
 	snake={
 		pos_x:50,
@@ -85,8 +92,9 @@ function init(){
 	//DOM element for displaying info about framerate and total no of frames rendered.
 	infoBox=document.getElementById("infoDiv");
 
+	console.log(window.innerWidth);
+	console.log(window.innerHeight);
 	
-
 	//begin the loop
 	loop();
 	
@@ -129,7 +137,9 @@ function update(){
 	
 	if(pressedKeys[27]){
 		isPaused=!isPaused;
+		delete pressedKeys[27];
 	}
+	
 	
 	
 	if(curTime-updateTimer>=25 && !isPaused){ 
@@ -234,18 +244,7 @@ function update(){
 	
 	}
 	
-	
-	
-	
-	
 }
-
-
-
-
-
-
-
 	
 //render scene
 function render(){
@@ -259,13 +258,29 @@ ctx.fillStyle="#0f0";
 ctx.fillRect(snack.pos_x,snack.pos_y,snack.width,snack.height);
 
 //draw the score  
-ctx.fillStyle="#fff";
+ctx.fillStyle="#000";
 ctx.font = "bold 20px helvetica";
 ctx.fillText("Score:"+score,10,20);
 
-
-console.log("isPaused:"+isPaused);
+//console.log("isPaused:"+isPaused);
 	
+	
+//If the game is paused,show that on the screen 
+if(isPaused){
+ctx.fillStyle="#F00";
+ctx.font = "bold 20px helvetica";
+ctx.fillText('Game Paused',((canvas.width)/2-60),canvas.height-40);
+ctx.fillText('Press ESC to resume',((canvas.width)/2-100),canvas.height-20);
+
+}
+
+//line for testing...
+/*
+ctx.fillStyle="#000";
+ctx.moveTo(canvas.width/2,0);
+ctx.lineTo(canvas.width/2,canvas.height);
+ctx.stroke();
+*/
 
 //update info about framecount and framerate	
 infoBox.innerHTML="";
