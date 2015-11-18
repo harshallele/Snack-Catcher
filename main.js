@@ -218,36 +218,92 @@ function update(){
 		down-3
 		up-4
 		*/
+		
+		
+		//Change the direction according to directionCode,
+		//if isMultiDir is 1, then change secondary direction.
+		//For eg. if the snack moves towards right and if isMultiDir is 1,
+		//then the y co-ordinate will be changed according to secDirectionCode
+		//(if it is 1, then decrease y co-ordinate,else increase it)
 		if(snackMoveCounter > 0){
 			switch (directionCode){
 				case 1:
 					if(snack.pos_x < canvas.width-snack.width){ 
 						snack.pos_x+=snack.diff_x;
+						
+						if(isMultiDir==1){
+							if(secDirectionCode==1){
+								if(snack.pos_y>0)snack.pos_y-=snack.diff_y;
+								}
+							else{
+								if(snack.pos_y+snack.height<canvas.height)snack.pos_y+=snack.diff_y;
+								}
+							}
 						}
+						
 					else{
 						snackMoveCounter=0;
 					}
 					break;
+				
+				
 				case 2:
 					if(snack.pos_x > 0){
 					snack.pos_x-=snack.diff_x;
+					
+					
+					if(isMultiDir==1){
+							if(secDirectionCode==1){
+								
+								if(snack.pos_y>0)snack.pos_y-=snack.diff_y;
+								}
+							else{
+								if(snack.pos_y+snack.height<canvas.height)snack.pos_y+=snack.diff_y;
+								}
+							}
 					}
+					
 					else{
 						snackMoveCounter=0;
 					}
 					break;
+				
+				
 				case 3:
 					if(snack.pos_y < canvas.height-snack.height){
 					snack.pos_y+=snack.diff_y;
+					
+					if(isMultiDir==1){
+							if(secDirectionCode==1){
+								
+								if(snack.pos_x>0)snack.pos_x-=snack.diff_x;
+								}
+							else{
+								if(snack.pos_x+snack.width<canvas.width)snack.pos_x+=snack.diff_x;
+								}
+							}
 					}
+					
 					else{
 						snackMoveCounter=0;
 					}
 					break;
+				
+				
 				case 4:
 					if(snack.pos_y > 0){
 					snack.pos_y-=snack.diff_y;
+						
+						if(isMultiDir==1){
+							if(secDirectionCode==1){
+								if(snack.pos_x>0)snack.pos_x-=snack.diff_x;
+								}
+							else{
+								if(snack.pos_x+snack.width<canvas.width)snack.pos_x+=snack.diff_x;
+								}
+							}
 					}
+					
 					else{
 						snackMoveCounter=0;
 					}
