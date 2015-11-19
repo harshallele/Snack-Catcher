@@ -1,8 +1,8 @@
 window.addEventListener("load",init);
 window.addEventListener("resize",resizeGame);
 
-
-var canvas,ctx;
+//DOM elements
+var canvas,ctx,full_screen_button;
 
 //global variables for the player and snack
 var player,snack;
@@ -64,11 +64,14 @@ function init(){
 	canvas = document.getElementById("screen");
 	ctx=canvas.getContext("2d");
 	
-	
-	
 	canvas.width=window.innerWidth*0.8;
 	canvas.height=window.innerHeight*0.8;
 	
+	
+	full_screen_button=document.getElementById("full_screen_button");
+	console.log("Full screen button:"+full_screen_button);
+	full_screen_button.style.top=(canvas.height-32).toString()+"px";
+	full_screen_button.style.left=(canvas.width-32).toString()+"px";	
 	
 	//size is avarage of 2.5% of the width and height of canvas.
 	//PROBABLY WILL CHANGE
@@ -399,6 +402,11 @@ function resizeGame(){
 	//change size of canvas
 	canvas.width=window.innerWidth*0.8;
 	canvas.height=window.innerHeight*0.8;
+	//change position of  full screen button
+	full_screen_button.style.top=(canvas.height-32).toString()+"px";
+	full_screen_button.style.left=(canvas.width-32).toString()+"px";	
+	
+	
 	
 	char_size=((canvas.width*0.025)+(canvas.height*0.025))/2;
 	
