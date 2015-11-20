@@ -1,3 +1,4 @@
+//Event listeners
 window.addEventListener("load",init);
 window.addEventListener("resize",resizeGame);
 
@@ -6,8 +7,6 @@ var canvas,ctx;
 
 //global variables for on screen elements
 var player,snack,full_screen_button;
-
-
 
 //the array of pressed keys
 var pressedKeys=[];
@@ -63,6 +62,9 @@ var char_size;
 var full_screen_button;	
 
 
+//mouse co-ordinates
+var mouse_x,mouse_y;
+
 //init
 function init(){
 	//define DOM elements
@@ -74,21 +76,18 @@ function init(){
 	canvas.width=window.innerWidth*0.8;
 	canvas.height=window.innerHeight*0.8;
 	
-	/*
-    //set position of full screen button
-	full_screen_button.style.top=(canvas.offsetTop+canvas.height-32).toString()+"px";
-	full_screen_button.style.left=(canvas.offsetLeft+canvas.width-32).toString()+"px";	
-	*/
+	
+	//mouse-move listener for canvas
+	canvas.addEventListener("mousemove",getCoordinates);
+	
 	
 	//define full_screen button,co-ordinates and click area.
 	var image=new Image();
 	full_screen_button={
-		
-		image:loadImage(image,"full_screen.png"),
+		image_normal:loadImage(image,"full_screen.png"),
+		image_hover:loadImage(image,"full_screen_hover.png"),
 		pos_x:canvas.offsetLeft+canvas.width-45,
 		pos_y:canvas.offsetTop+canvas.height-45
-		
-		
 		};
 		
 	
@@ -366,13 +365,17 @@ ctx.fillStyle="#000";
 ctx.font = "bold 20px helvetica";
 ctx.fillText("Score:"+score,10,20);
 
-	
-ctx.drawImage(full_screen_button.image,full_screen_button.pos_x,full_screen_button.pos_y);
-console.log("top:"+full_screen_button.pos_y);
-console.log("left:"+full_screen_button.pos_x);
-	
+//If mouse position is inside the full screen button, then render the hover button 
+//If not, then render normal button
+if(mouse_x > full_screen_button.pos_x && mouse_y > full_screen_button.pos_y && mouse_x < full_screen_button.pos_x+45 && mouse_y < full_screen_button.pos_y+45){
+			ctx.drawImage(full_screen_button.image_hover,full_screen_button.pos_x,full_screen_button.pos_y);
+	}
 
-//console.log("isPaused:"+isPaused);
+else{
+		ctx.drawImage(full_screen_button.image_normal,full_screen_button.pos_x,full_screen_button.pos_y);
+	}
+
+
 	
 	
 //If the game is paused,show that on the screen 
@@ -467,6 +470,15 @@ function loadImage(imageObj,src){
 		return(imageObj);
 		}
 
+//set co-ordinates, used for handling mouse over and click handling
+function getCoordinates(e){
+	mouse_x=e.clientX;
+	mouse_y=e.clientY;
+	
+	console.log("X:"+mouse_x);
+	console.log("Y:"+mouse_y);
+	
+	}
 
 
 //when a key is pressed down,put the keycode in the pressedKeys array
