@@ -2,10 +2,12 @@ window.addEventListener("load",init);
 window.addEventListener("resize",resizeGame);
 
 //DOM elements
-var canvas,ctx,full_screen_button;
+var canvas,ctx;
 
-//global variables for the player and snack
-var player,snack;
+//global variables for on screen elements
+var player,snack,full_screen_button;
+
+
 
 //the array of pressed keys
 var pressedKeys=[];
@@ -57,21 +59,40 @@ var isPaused=false;
 //size of player and snack
 var char_size;
 	
+//full screen button
+var full_screen_button;	
+
 
 //init
 function init(){
-	
+	//define DOM elements
 	canvas = document.getElementById("screen");
 	ctx=canvas.getContext("2d");
+	//full_screen_button=document.getElementById("full_screen_button");
 	
+	//set canvas dimensions
 	canvas.width=window.innerWidth*0.8;
 	canvas.height=window.innerHeight*0.8;
 	
+	/*
+    //set position of full screen button
+	full_screen_button.style.top=(canvas.offsetTop+canvas.height-32).toString()+"px";
+	full_screen_button.style.left=(canvas.offsetLeft+canvas.width-32).toString()+"px";	
+	*/
 	
-	full_screen_button=document.getElementById("full_screen_button");
-	console.log("Full screen button:"+full_screen_button);
-	full_screen_button.style.top=(canvas.height-32).toString()+"px";
-	full_screen_button.style.left=(canvas.width-32).toString()+"px";	
+	//define full_screen button,co-ordinates and click area.
+	var image=new Image();
+	full_screen_button={
+		
+		image:loadImage(image,"full_screen.png"),
+		pos_x:canvas.offsetLeft+canvas.width-45,
+		pos_y:canvas.offsetTop+canvas.height-45
+		
+		
+		};
+		
+	
+		
 	
 	//size is avarage of 2.5% of the width and height of canvas.
 	//PROBABLY WILL CHANGE
@@ -345,6 +366,12 @@ ctx.fillStyle="#000";
 ctx.font = "bold 20px helvetica";
 ctx.fillText("Score:"+score,10,20);
 
+	
+ctx.drawImage(full_screen_button.image,full_screen_button.pos_x,full_screen_button.pos_y);
+console.log("top:"+full_screen_button.pos_y);
+console.log("left:"+full_screen_button.pos_x);
+	
+
 //console.log("isPaused:"+isPaused);
 	
 	
@@ -402,11 +429,11 @@ function resizeGame(){
 	//change size of canvas
 	canvas.width=window.innerWidth*0.8;
 	canvas.height=window.innerHeight*0.8;
+	
+	
 	//change position of  full screen button
-	full_screen_button.style.top=(canvas.height-32).toString()+"px";
-	full_screen_button.style.left=(canvas.width-32).toString()+"px";	
-	
-	
+	full_screen_button.pos_x=canvas.offsetLeft+canvas.width-45;
+	full_screen_button.pos_y=canvas.offsetTop+canvas.height-45;
 	
 	char_size=((canvas.width*0.025)+(canvas.height*0.025))/2;
 	
@@ -427,20 +454,24 @@ function resizeGame(){
 	snack.pos_x=snack.pos_x*width_ratio;
 	snack.pos_y=snack.pos_y*height_ratio;
 	
-	
-	
+
 	
 	
 }
 
 
 
+//load images
+function loadImage(imageObj,src){
+		imageObj.src=src;
+		return(imageObj);
+		}
+
+
 
 //when a key is pressed down,put the keycode in the pressedKeys array
 function onKeyDown(e){
-	
 	pressedKeys[e.keyCode]=true;
-	
 }
 
 
@@ -449,9 +480,6 @@ function onKeyDown(e){
 function onKeyUp(e){
 	delete pressedKeys[e.keyCode];
 }
-
-
-
 
 
 //return a random integer from a range of values between min and max
