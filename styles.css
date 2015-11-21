@@ -1,13 +1,27 @@
+*{
+	/* to remove the top and left whitespace */
+	margin:0;
+	padding:0;
+}
+
+html,body{
+width:100%;
+height:100%;
+
+}
+
 #screen{
 	background-color:#E4E4E4;
 	float:left;
 	margin-right:10px;
 	z-index:1;
 	position:absolute;
+	display:block;
 }
 
 #infoDiv{	
 	float:left;
+	/* to remove scrollbars*/
 	display:none;	
 }
 

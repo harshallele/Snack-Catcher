@@ -1,6 +1,8 @@
 //Event listeners
 window.addEventListener("load",init);
 window.addEventListener("resize",resizeGame);
+window.addEventListener("mousemove",getCoordinates);
+	
 
 //DOM elements
 var canvas,ctx;
@@ -61,9 +63,11 @@ var char_size;
 //full screen button
 var full_screen_button;	
 
-
 //mouse co-ordinates
 var mouse_x,mouse_y;
+
+//boolean that tells if game is full screen.
+var isFullScreen = false;
 
 //init
 function init(){
@@ -77,17 +81,26 @@ function init(){
 	canvas.height=window.innerHeight*0.8;
 	
 	
-	//mouse-move listener for canvas
-	canvas.addEventListener("mousemove",getCoordinates);
+	//event listeners for canvas
+	canvas.addEventListener("click",handleClick);
 	
 	
-	//define full_screen button,co-ordinates and click area.
-	var image=new Image();
+	
+	
+	//define full_screen button,co-ordinates,click area 
+	//and whether the mouse cursor is in the click area
+	var i1=new Image();
+	var i2=new Image();
+	
 	full_screen_button={
-		image_normal:loadImage(image,"full_screen.png"),
-		image_hover:loadImage(image,"full_screen_hover.png"),
+		image_normal:loadImage(i1,"full_screen.png"),
+		image_hover:loadImage(i2,"full_screen_hover.png"),
 		pos_x:canvas.offsetLeft+canvas.width-45,
-		pos_y:canvas.offsetTop+canvas.height-45
+		pos_y:canvas.offsetTop+canvas.height-45,
+		isInClickArea:false
+		
+		
+		
 		};
 		
 	
@@ -175,10 +188,20 @@ function update(){
 	var date=new Date();
 	var curTime=date.getTime();
 	
-	if(pressedKeys[27]){
+	//Check for Space bar outside the if block because
+	//if isPaused is true once, code inside the block won't get executed
+	//But we want to check for space bar everytime
+	if(pressedKeys[32]){
 		isPaused=!isPaused;
+		delete pressedKeys[32];
+	}
+	
+	//check ESC key for exiting from full screen.
+	if(pressedKeys[27]){
+		isFullScreen=false;
 		delete pressedKeys[27];
 	}
+	
 	
 	
 	
@@ -365,16 +388,21 @@ ctx.fillStyle="#000";
 ctx.font = "bold 20px helvetica";
 ctx.fillText("Score:"+score,10,20);
 
-//If mouse position is inside the full screen button, then render the hover button 
-//If not, then render normal button
-if(mouse_x > full_screen_button.pos_x && mouse_y > full_screen_button.pos_y && mouse_x < full_screen_button.pos_x+45 && mouse_y < full_screen_button.pos_y+45){
-			ctx.drawImage(full_screen_button.image_hover,full_screen_button.pos_x,full_screen_button.pos_y);
-	}
 
-else{
-		ctx.drawImage(full_screen_button.image_normal,full_screen_button.pos_x,full_screen_button.pos_y);
-	}
+if(!isFullScreen){
+	//If mouse position is inside the full screen button, then render the hover button 
+	//If not, then render normal button
+	if(mouse_x > full_screen_button.pos_x && mouse_y > full_screen_button.pos_y && mouse_x < full_screen_button.pos_x+45 && mouse_y < full_screen_button.pos_y+45 && !isFullScreen){
+				ctx.drawImage(full_screen_button.image_hover,full_screen_button.pos_x,full_screen_button.pos_y);
+				full_screen_button.isInClickArea=true;
+		}
 
+	else{
+			ctx.drawImage(full_screen_button.image_normal,full_screen_button.pos_x,full_screen_button.pos_y);
+			
+		}
+
+}
 
 	
 	
@@ -383,7 +411,7 @@ if(isPaused){
 ctx.fillStyle="#F00";
 ctx.font = "bold 20px helvetica";
 ctx.fillText('Game Paused',((canvas.width)/2-60),canvas.height-40);
-ctx.fillText('Press ESC to resume',((canvas.width)/2-100),canvas.height-20);
+ctx.fillText('Press SPACE to resume',((canvas.width)/2-100),canvas.height-20);
 
 }
 
@@ -420,19 +448,22 @@ function detectCollision(){
 
 
 
+
+
+
 //resize the size of the canvas,the sizes,speeds and positions of the player
 function resizeGame(){
 	var width_ratio,height_ratio;
 	
+	//change canvas to be 80% of window size.
+	canvas.width=window.innerWidth*0.8;
+	canvas.height=window.innerHeight*0.8;
+		
 	//get the ratio of new canvas width/height to that of old canvas width/height,
 	//for calculating the new positions of the player and the snack.
 	width_ratio=(window.innerWidth*0.8)/canvas.width;
 	height_ratio=(window.innerHeight*0.8)/canvas.height;
 
-	//change size of canvas
-	canvas.width=window.innerWidth*0.8;
-	canvas.height=window.innerHeight*0.8;
-	
 	
 	//change position of  full screen button
 	full_screen_button.pos_x=canvas.offsetLeft+canvas.width-45;
@@ -463,6 +494,30 @@ function resizeGame(){
 }
 
 
+//handle mouse clicks that happen inside the canvas
+//Detect if the mouse is over any of the clickable elements inside the canvas 
+//by checking if isInClickArea for that element is true if it is,handle click depending upon which element was clicked
+function handleClick(){
+	
+	//check if the full screen button was clicked
+	if (full_screen_button.isInClickArea){
+		
+		if(!isFullScreen){
+				isFullScreen=true;
+				launchFullScreen(canvas);
+		
+			}
+		else if(isFullScreen){
+			isFullScreen=false;
+			}
+			
+		resizeGame();
+		console.log("Full screen button clicked!");
+		}
+	
+	}
+
+
 
 //load images
 function loadImage(imageObj,src){
@@ -470,13 +525,21 @@ function loadImage(imageObj,src){
 		return(imageObj);
 		}
 
+
 //set co-ordinates, used for handling mouse over and click handling
 function getCoordinates(e){
-	mouse_x=e.clientX;
-	mouse_y=e.clientY;
+	if(e.clientX < canvas.width && e.clientY < canvas.height){
+		mouse_x=e.clientX;
+		mouse_y=e.clientY;
+	}	
 	
-	console.log("X:"+mouse_x);
-	console.log("Y:"+mouse_y);
+	else {
+		mouse_x=0;
+		mouse_y=0;
+		
+		}
+	
+	
 	
 	}
 
@@ -498,6 +561,18 @@ function onKeyUp(e){
 function randInt(min,max){
 	return(Math.floor(Math.random() * (max - min + 1)) + min);
 	}
+
+
+// shim for full screen page
+function launchFullScreen(element) {
+  if(element.requestFullScreen) {
+    element.requestFullScreen();
+  } else if(element.mozRequestFullScreen) {
+    element.mozRequestFullScreen();
+  } else if(element.webkitRequestFullScreen) {
+    element.webkitRequestFullScreen();
+  }
+}
 
 
 
